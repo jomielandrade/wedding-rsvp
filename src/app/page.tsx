@@ -1,5 +1,6 @@
 import { InvitationShell } from "@/components/invitation/invitation-shell";
 import { CountdownSection } from "@/components/sections/countdown-section";
+import { GodparentsSection } from "@/components/sections/godparents-section";
 import { StorySection } from "@/components/sections/story-section";
 import { WeddingDetailsSection } from "@/components/sections/wedding-details-section";
 
@@ -9,6 +10,7 @@ export default function HomePage() {
       <CountdownSection />
       <StorySection />
       <WeddingDetailsSection />
+      <GodparentsSection />
     </InvitationShell>
   );
 }

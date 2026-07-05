@@ -68,17 +68,17 @@ export const weddingConfig: WeddingConfig = {
       title: "Wedding Day",
       date: "July 15, 2026",
       description:
-        "The day we promise forever — surrounded by the people who mean the most to us.",
+        "The day we promise forever - surrounded by the people who mean the most to us.",
     },
   ],
   godparents: [
     {
       title: "Ninong",
-      names: ["Godfather Name One", "Godfather Name Two"],
+      names: ["Mejavier Awitin", "Donato Hernandez"],
     },
     {
       title: "Ninang",
-      names: ["Godmother Name One", "Godmother Name Two"],
+      names: ["Rowena Awitin", "Mila Hernandez"],
     },
   ],
   gallery: [
@@ -162,8 +162,8 @@ export const weddingConfig: WeddingConfig = {
       "Your presence at our wedding is the greatest gift we could ask for. However, if you wish to bless us with a gift, a monetary contribution towards our future together would be deeply appreciated.",
     gcash: {
       enabled: true,
-      accountName: "Jomiel & Rojiely",
-      mobileNumber: "09XX XXX XXXX",
+      accountName: "Jomiel Andrade",
+      mobileNumber: "09xxxxxxxxx",
       qrImage: "/images/gcash-qr.png",
     },
     bank: {

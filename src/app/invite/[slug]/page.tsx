@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { InvitationShell } from "@/components/invitation/invitation-shell";
 import { CountdownSection } from "@/components/sections/countdown-section";
+import { GodparentsSection } from "@/components/sections/godparents-section";
 import { StorySection } from "@/components/sections/story-section";
 import { WeddingDetailsSection } from "@/components/sections/wedding-details-section";
 import { weddingConfig } from "@/config/wedding";
@@ -26,6 +27,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
       <CountdownSection />
       <StorySection />
       <WeddingDetailsSection />
+      <GodparentsSection />
     </InvitationShell>
   );
 }
