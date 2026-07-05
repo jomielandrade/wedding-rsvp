@@ -45,16 +45,16 @@ export const weddingConfig: WeddingConfig = {
     {
       id: "first-met",
       title: "First Met",
-      date: "2018",
+      date: "2014",
       description:
         "Our paths crossed in the most unexpected way, and from that moment, something beautiful began to unfold.",
     },
     {
-      id: "first-date",
-      title: "First Date",
-      date: "2020",
+      id: "graduate-work",
+      title: "Graduation & Work",
+      date: "2018",
       description:
-        "A simple evening that felt like coming home — laughter, stories, and the quiet certainty that this was special.",
+        "We shared many memories together, from graduation to work, and we've been through it all.",
     },
     {
       id: "proposal",
