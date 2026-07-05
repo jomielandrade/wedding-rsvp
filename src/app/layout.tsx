@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { weddingConfig } from "@/config/wedding";
 import { greatVibes, playfair, poppins } from "@/lib/fonts";
 import "./globals.css";
@@ -46,6 +47,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-background text-text antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );
