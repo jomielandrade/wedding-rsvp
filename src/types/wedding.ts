@@ -42,20 +42,18 @@ export interface FaqItem {
   answer: string;
 }
 
+export interface BankAccount {
+  id: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  qrImage?: string;
+  enabled?: boolean;
+}
+
 export interface GiftRegistryConfig {
   message: string;
-  gcash?: {
-    enabled: boolean;
-    accountName: string;
-    mobileNumber: string;
-    qrImage?: string;
-  };
-  bank?: {
-    enabled: boolean;
-    bankName: string;
-    accountName: string;
-    accountNumber: string;
-  };
+  banks: BankAccount[];
   customImage?: string;
 }
 

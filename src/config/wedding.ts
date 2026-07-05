@@ -216,18 +216,24 @@ export const weddingConfig: WeddingConfig = {
   giftRegistry: {
     message:
       "Your presence at our wedding is the greatest gift we could ask for. However, if you wish to bless us with a gift, a monetary contribution towards our future together would be deeply appreciated.",
-    gcash: {
-      enabled: true,
-      accountName: "Jomiel Andrade",
-      mobileNumber: "09xxxxxxxxx",
-      qrImage: "/images/gcash-qr.png",
-    },
-    bank: {
-      enabled: true,
-      bankName: "BDO",
-      accountName: "Jomiel & Rojiely",
-      accountNumber: "XXXX XXXX XXXX",
-    },
+    banks: [
+      {
+        id: "gotyme",
+        bankName: "GoTyme Bank",
+        accountName: "Rojiely Palma",
+        accountNumber: "XXXX XXXX XXXX",
+        qrImage: "/images/banks/gotyme.JPG",
+        enabled: true,
+      },
+      {
+        id: "maya",
+        bankName: "Maya Bank, Inc.",
+        accountName: "Jomiel Hernandez Andrade",
+        accountNumber: "8059 8055 4598",
+        qrImage: "/images/banks/maya.JPG",
+        enabled: true,
+      },
+    ],
   },
   contact: {
     email: "hello@example.com",
