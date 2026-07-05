@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D9E4EC"/>
+      <stop offset="50%" style="stop-color:#F8F6F3"/>
+      <stop offset="100%" style="stop-color:#AFC4D3"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <!-- Soft floral accents -->
+  <g opacity="0.15" fill="#7A9EBE">
+    <circle cx="200" cy="800" r="120"/>
+    <circle cx="350" cy="900" r="80"/>
+    <circle cx="1600" cy="200" r="100"/>
+    <circle cx="1750" cy="350" r="70"/>
+    <circle cx="960" cy="100" r="60"/>
+  </g>
+  <g opacity="0.1" fill="#AFC4D3">
+    <ellipse cx="100" cy="300" rx="150" ry="100"/>
+    <ellipse cx="1820" cy="700" rx="130" ry="90"/>
+    <ellipse cx="960" cy="950" rx="200" ry="80"/>
+  </g>
+  <!-- Delicate line art flowers -->
+  <g stroke="#7A9EBE" stroke-width="1.5" fill="none" opacity="0.25">
+    <path d="M150 400 Q180 350 210 400 Q180 450 150 400"/>
+    <path d="M1770 600 Q1800 550 1830 600 Q1800 650 1770 600"/>
+    <path d="M960 500 Q990 450 1020 500 Q990 550 960 500"/>
+    <circle cx="180" cy="400" r="8" fill="#7A9EBE" opacity="0.3"/>
+    <circle cx="1800" cy="600" r="8" fill="#7A9EBE" opacity="0.3"/>
+    <circle cx="990" cy="500" r="8" fill="#7A9EBE" opacity="0.3"/>
+  </g>
+</svg>
