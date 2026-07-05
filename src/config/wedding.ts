@@ -16,17 +16,13 @@ export const weddingConfig: WeddingConfig = {
     name: "Pateros Municipal Hall",
     address: "Pateros, Metro Manila, Philippines",
     time: "9:00 AM",
-    mapsUrl: "https://maps.google.com/?q=Pateros+Municipal+Hall",
-    mapsEmbedUrl:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3864.0!2d121.068!3d14.548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPateros%20Municipal%20Hall!5e0!3m2!1sen!2sph!4v1700000000000",
+    mapsUrl: "https://maps.app.goo.gl/sFGE4xbiGvXrCdk96",
   },
   reception: {
     name: "Max's Restaurant – Vista Mall Taguig",
     address: "Vista Mall, Taguig, Metro Manila, Philippines",
     time: "11:00 AM",
-    mapsUrl: "https://maps.google.com/?q=Max's+Restaurant+Vista+Mall+Taguig",
-    mapsEmbedUrl:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3864.0!2d121.050!3d14.518!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sMax%27s%20Restaurant%20Vista%20Mall%20Taguig!5e0!3m2!1sen!2sph!4v1700000000000",
+    mapsUrl: "https://maps.app.goo.gl/5yMabr4dA7d8eyJr9",
   },
   schedule: [
     {

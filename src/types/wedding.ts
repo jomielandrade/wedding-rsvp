@@ -12,7 +12,8 @@ export interface VenueDetails {
   address: string;
   time: string;
   mapsUrl: string;
-  mapsEmbedUrl: string;
+  /** Optional override. When omitted, embed URL is built from name + address. */
+  mapsEmbedUrl?: string;
 }
 
 export interface StoryMilestone {
