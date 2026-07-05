@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { InvitationShell } from "@/components/invitation/invitation-shell";
 import { CountdownSection } from "@/components/sections/countdown-section";
+import { StorySection } from "@/components/sections/story-section";
 import { weddingConfig } from "@/config/wedding";
 
 interface InvitePageProps {
@@ -22,6 +23,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
   return (
     <InvitationShell guestName={guest.fullName}>
       <CountdownSection />
+      <StorySection />
     </InvitationShell>
   );
 }

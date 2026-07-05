@@ -110,9 +110,10 @@ export function useInvitationReveal() {
   const openInvitation = useCallback(() => {
     setIsRevealed(true);
     window.setTimeout(() => {
-      document
-        .getElementById(SECTION_IDS.countdown)
-        ?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById(SECTION_IDS.countdown)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }, 400);
   }, []);
 

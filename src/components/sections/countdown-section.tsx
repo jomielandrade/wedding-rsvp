@@ -88,7 +88,7 @@ export function CountdownSection() {
   return (
     <section
       id={SECTION_IDS.countdown}
-      className="section-padding relative mx-auto max-w-6xl overflow-hidden"
+      className="section-padding relative mx-auto flex min-h-[100dvh] max-w-6xl scroll-mt-0 flex-col justify-center overflow-hidden"
       aria-label="Wedding countdown"
     >
       <div
@@ -146,6 +146,9 @@ export function CountdownSection() {
         <FadeUp delay={0.5}>
           <p className="mt-10 text-center text-sm text-text/50">
             Until we say &ldquo;I do&rdquo;
+          </p>
+          <p className="mt-6 text-center text-xs uppercase tracking-[0.2em] text-primary/50">
+            Scroll to continue
           </p>
         </FadeUp>
       )}
