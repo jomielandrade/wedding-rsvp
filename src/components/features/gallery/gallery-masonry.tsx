@@ -13,6 +13,8 @@ interface GalleryMasonryProps {
   onImageClick: (index: number) => void;
 }
 
+const THUMB_QUALITY = 75;
+
 function MasonryImage({
   image,
   index,
@@ -20,33 +22,36 @@ function MasonryImage({
   image: GalleryImage;
   index: number;
 }) {
-  const [useFallback, setUseFallback] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div
+        className="flex aspect-[3/4] w-full items-center justify-center rounded-2xl bg-accent/40 text-sm text-text/50"
+        role="img"
+        aria-label={image.alt}
+      >
+        Photo unavailable
+      </div>
+    );
+  }
 
   return (
     <div
       className="relative w-full"
       style={{ aspectRatio: `${image.width} / ${image.height}` }}
     >
-      {useFallback ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={image.src}
-          alt={image.alt}
-          loading={index < 2 ? "eager" : "lazy"}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          unoptimized
-          loading={index < 2 ? "eager" : "lazy"}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 50vw, 33vw"
-          onError={() => setUseFallback(true)}
-        />
-      )}
+      <Image
+        src={image.src}
+        alt={image.alt}
+        fill
+        quality={THUMB_QUALITY}
+        loading={index < 2 ? "eager" : "lazy"}
+        decoding="async"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        sizes="(max-width: 768px) 45vw, 280px"
+        onError={() => setHasError(true)}
+      />
 
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -75,7 +80,7 @@ export function GalleryMasonry({ images, onImageClick }: GalleryMasonryProps) {
       aria-label="Photo gallery"
     >
       {images.map((image, index) => (
-        <FadeUp key={image.id} delay={(index % 3) * 0.1} className="break-inside-avoid">
+        <FadeUp key={image.id} delay={Math.min(index, 4) * 0.05} className="break-inside-avoid">
           <motion.button
             type="button"
             onClick={() => onImageClick(index)}

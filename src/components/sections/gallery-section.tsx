@@ -8,10 +8,12 @@ import {
 import { GalleryMasonry } from "@/components/features/gallery/gallery-masonry";
 import { FadeUp } from "@/components/animations/motion-primitives";
 import { SectionHeader } from "@/components/layout/section-header";
+import { Button } from "@/components/ui/button";
 import { SECTION_IDS } from "@/lib/constants";
+import { ExternalLink } from "lucide-react";
 
 export function GallerySection() {
-  const { gallery } = weddingConfig;
+  const { gallery, gallerySharedAlbumUrl } = weddingConfig;
   const lightbox = useGalleryLightbox();
 
   if (gallery.length === 0) {
@@ -39,6 +41,23 @@ export function GallerySection() {
       </FadeUp>
 
       <GalleryMasonry images={gallery} onImageClick={lightbox.open} />
+
+      {gallerySharedAlbumUrl && (
+        <FadeUp delay={0.1}>
+          <div className="mt-10 text-center">
+            <Button variant="outline" asChild>
+              <a
+                href={gallerySharedAlbumUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="size-4" aria-hidden />
+                View full album
+              </a>
+            </Button>
+          </div>
+        </FadeUp>
+      )}
 
       <GalleryLightbox
         images={gallery}

@@ -9,12 +9,14 @@ interface InvitationShellProps {
 }
 
 export function InvitationShell({ guestName, children }: InvitationShellProps) {
-  const { isRevealed, openInvitation } = useInvitationReveal();
+  const isInvite = Boolean(guestName);
+  const { isRevealed, openInvitation } = useInvitationReveal(!isInvite);
 
   return (
     <>
       <HeroSection
         guestName={guestName}
+        isInvite={isInvite}
         onOpenInvitation={openInvitation}
         isRevealed={isRevealed}
       />

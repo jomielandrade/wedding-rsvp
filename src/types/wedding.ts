@@ -36,6 +36,18 @@ export interface GalleryImage {
   height: number;
 }
 
+export interface DressCodeColor {
+  id: string;
+  name: string;
+  hex: string;
+}
+
+export interface DressCodeConfig {
+  title: string;
+  description: string;
+  colors: DressCodeColor[];
+}
+
 export interface FaqItem {
   id: string;
   question: string;
@@ -103,15 +115,13 @@ export interface WeddingConfig {
   story: StoryMilestone[];
   godparents: GodparentGroup[];
   gallery: GalleryImage[];
+  /** Optional link to a shared album (e.g. iCloud) for guests who want more photos. */
+  gallerySharedAlbumUrl?: string;
+  dressCode: DressCodeConfig;
   faq: FaqItem[];
   giftRegistry: GiftRegistryConfig;
   contact: ContactInfo;
   socialLinks: SocialLink[];
-  music?: {
-    enabled: boolean;
-    src: string;
-    title: string;
-  };
   rsvp: {
     deadline: string;
     emailConfirmation: boolean;

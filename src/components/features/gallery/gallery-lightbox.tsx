@@ -74,9 +74,13 @@ export function GalleryLightbox({
                 <Image
                   src={current.src}
                   alt={current.alt}
-                  width={current.width}
-                  height={current.height}
-                  unoptimized
+                  width={Math.min(current.width, 1400)}
+                  height={Math.round(
+                    (current.height * Math.min(current.width, 1400)) /
+                      current.width,
+                  )}
+                  quality={85}
+                  sizes="(max-width: 768px) 95vw, 900px"
                   className="mx-auto max-h-[80vh] w-auto object-contain"
                   priority
                 />
