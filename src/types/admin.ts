@@ -19,6 +19,10 @@ export interface AdminGuestRow {
   maxGuests: number;
   inviteUrl: string;
   status: GuestRsvpStatus;
+  inviteOpened: boolean;
+  firstOpenedAt: string | null;
+  lastOpenedAt: string | null;
+  openCount: number;
   rsvp: RsvpRecord | null;
 }
 

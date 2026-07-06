@@ -73,3 +73,40 @@ export async function deleteGuest(id: string) {
   const supabase = createServerClient();
   return supabase.from("guests").delete().eq("id", id);
 }
+
+export async function recordInviteOpen(slug: string) {
+  const supabase = createServerClient();
+  const { data: guest, error } = await supabase
+    .from("guests")
+    .select("id, first_opened_at, open_count")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error || !guest) {
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  if (!guest.first_opened_at) {
+    await supabase
+      .from("guests")
+      .update({
+        first_opened_at: now,
+        last_opened_at: now,
+        open_count: 1,
+        updated_at: now,
+      })
+      .eq("id", guest.id);
+    return;
+  }
+
+  await supabase
+    .from("guests")
+    .update({
+      last_opened_at: now,
+      open_count: (guest.open_count ?? 0) + 1,
+      updated_at: now,
+    })
+    .eq("id", guest.id);
+}

@@ -46,6 +46,9 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
   const [statusFilter, setStatusFilter] = useState<"all" | AdminGuestRow["status"]>(
     "all",
   );
+  const [openedFilter, setOpenedFilter] = useState<"all" | "opened" | "not-opened">(
+    "all",
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingGuest, setEditingGuest] = useState<AdminGuestRow | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -61,9 +64,13 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
         guest.slug.toLowerCase().includes(normalized);
       const matchesStatus =
         statusFilter === "all" || guest.status === statusFilter;
-      return matchesQuery && matchesStatus;
+      const matchesOpened =
+        openedFilter === "all" ||
+        (openedFilter === "opened" && guest.inviteOpened) ||
+        (openedFilter === "not-opened" && !guest.inviteOpened);
+      return matchesQuery && matchesStatus && matchesOpened;
     });
-  }, [guests, query, statusFilter]);
+  }, [guests, query, statusFilter, openedFilter]);
 
   const openCreateDialog = () => {
     setEditingGuest(null);
@@ -175,10 +182,21 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
               }
               className="h-11 rounded-xl border border-primary/20 bg-white px-4 text-sm text-text"
             >
-              <option value="all">All statuses</option>
+              <option value="all">All RSVP statuses</option>
               <option value="pending">Pending</option>
               <option value="attending">Attending</option>
               <option value="declining">Declining</option>
+            </select>
+            <select
+              value={openedFilter}
+              onChange={(event) =>
+                setOpenedFilter(event.target.value as typeof openedFilter)
+              }
+              className="h-11 rounded-xl border border-primary/20 bg-white px-4 text-sm text-text"
+            >
+              <option value="all">All invite views</option>
+              <option value="opened">Opened invite</option>
+              <option value="not-opened">Not opened yet</option>
             </select>
           </div>
 
@@ -194,7 +212,8 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
             <thead className="border-b border-black/5 bg-black/[0.02] text-text/60">
               <tr>
                 <th className="px-6 py-3 font-medium">Guest</th>
-                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium">RSVP</th>
+                <th className="px-6 py-3 font-medium">Opened</th>
                 <th className="px-6 py-3 font-medium">Max guests</th>
                 <th className="px-6 py-3 font-medium">Invite link</th>
                 <th className="px-6 py-3 font-medium">Actions</th>
@@ -203,7 +222,7 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
             <tbody>
               {filteredGuests.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-text/50">
+                  <td colSpan={6} className="px-6 py-10 text-center text-text/50">
                     {guests.length === 0
                       ? "No guests yet. Add your first guest to create an invite link."
                       : "No guests match your filters."}
@@ -228,6 +247,30 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                       >
                         {guest.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {guest.inviteOpened ? (
+                        <div>
+                          <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700">
+                            Opened
+                          </span>
+                          {guest.firstOpenedAt && (
+                            <p className="mt-1 text-xs text-text/50">
+                              {new Date(guest.firstOpenedAt).toLocaleString(
+                                "en-PH",
+                                {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                },
+                              )}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="inline-flex rounded-full bg-black/[0.04] px-2.5 py-1 text-xs font-medium text-text/50">
+                          Not yet
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4">{guest.maxGuests}</td>
                     <td className="max-w-xs truncate px-6 py-4 text-text/70">

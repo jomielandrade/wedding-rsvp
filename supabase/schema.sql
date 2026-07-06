@@ -27,12 +27,16 @@ create table if not exists public.guests (
   slug text not null unique,
   full_name text not null,
   max_guests integer not null default 1 check (max_guests >= 1 and max_guests <= 20),
+  first_opened_at timestamptz,
+  last_opened_at timestamptz,
+  open_count integer not null default 0 check (open_count >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists guests_slug_idx on public.guests (slug);
 create index if not exists guests_full_name_idx on public.guests (full_name);
+create index if not exists guests_first_opened_at_idx on public.guests (first_opened_at desc nulls last);
 
 alter table public.guests enable row level security;
 
