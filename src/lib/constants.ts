@@ -14,6 +14,7 @@ export const SECTION_IDS = {
   details: "details",
   godparents: "godparents",
   gallery: "gallery",
+  dressCode: "dress-code",
   gifts: "gifts",
   rsvp: "rsvp",
   faq: "faq",

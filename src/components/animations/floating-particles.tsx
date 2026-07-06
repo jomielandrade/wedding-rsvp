@@ -47,16 +47,16 @@ export function FloatingParticles({ count = 24 }: { count?: number }) {
       {particles.map((particle) => (
         <motion.span
           key={particle.id}
-          className="absolute rounded-full bg-white/40"
+          className="absolute rounded-full bg-primary/25 shadow-[0_0_8px_rgba(122,158,190,0.35)]"
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
+            width: `${particle.size + 1}px`,
+            height: `${particle.size + 1}px`,
           }}
           animate={{
-            y: [0, -30, 0],
-            opacity: [0.2, 0.6, 0.2],
+            y: [0, -24, 0],
+            opacity: [0.25, 0.65, 0.25],
           }}
           transition={{
             duration: particle.duration,

@@ -168,10 +168,10 @@ export const weddingConfig: WeddingConfig = {
     },
     {
       id: "gallery-2025",
-      src: "/images/gallery/2025.jpeg",
+      src: "/images/gallery/2025.jpg",
       alt: "2025",
-      width: 3024,
-      height: 4032,
+      width: 1600,
+      height: 2133,
     },
     {
       id: "gallery-2026",
@@ -181,6 +181,16 @@ export const weddingConfig: WeddingConfig = {
       height: 1440,
     },
   ],
+  dressCode: {
+    title: "Dress Code",
+    description: "Smart casual attire in the following shades",
+    colors: [
+      { id: "peach", name: "Pale Peach", hex: "#E5CFC0" },
+      { id: "ochre", name: "Muted Ochre", hex: "#C9B08A" },
+      { id: "dusty-blue", name: "Dusty Blue", hex: "#8BA4BE" },
+      { id: "slate-blue", name: "Slate Blue", hex: "#4E6478" },
+    ],
+  },
   faq: [
     {
       id: "plus-one",
@@ -240,11 +250,6 @@ export const weddingConfig: WeddingConfig = {
     phone: "+63 9XX XXX XXXX",
   },
   socialLinks: [],
-  music: {
-    enabled: true,
-    src: "/audio/wedding-music.mp3",
-    title: "Our Song",
-  },
   rsvp: {
     deadline: "2026-06-15",
     emailConfirmation: false,
