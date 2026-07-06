@@ -47,7 +47,7 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8 md:px-8 md:py-10">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-10">
       <AdminHeader />
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
