@@ -9,6 +9,7 @@ export interface RsvpInsertPayload {
   email: string | null;
   attendance: RsvpFormValues["attendance"];
   guest_count: number;
+  companion_names: string[];
   song_request: string | null;
   message: string | null;
 }
@@ -24,6 +25,13 @@ export function toRsvpInsertPayload(
     email: data.email?.trim() || null,
     attendance: data.attendance,
     guest_count: data.attendance === "attending" ? data.guestCount : 0,
+    companion_names:
+      data.attendance === "attending" && data.guestCount > 1
+        ? data.companionNames
+            .slice(0, data.guestCount - 1)
+            .map((name) => name.trim())
+            .filter(Boolean)
+        : [],
     song_request: data.songRequest?.trim() || null,
     message: data.message?.trim() || null,
   };
@@ -36,6 +44,19 @@ export async function findRsvpByInviteSlug(inviteSlug: string) {
     .select("id, attendance")
     .eq("invite_slug", inviteSlug)
     .maybeSingle();
+}
+
+export async function listAllRsvps() {
+  const supabase = createServerClient();
+  return supabase
+    .from("rsvp")
+    .select("*")
+    .order("created_at", { ascending: false });
+}
+
+export async function deleteRsvpByInviteSlug(inviteSlug: string) {
+  const supabase = createServerClient();
+  return supabase.from("rsvp").delete().eq("invite_slug", inviteSlug);
 }
 
 export async function createRsvp(payload: RsvpInsertPayload) {

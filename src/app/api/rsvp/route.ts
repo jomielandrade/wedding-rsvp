@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const guest = getGuestBySlug(parsed.data.inviteSlug);
+  const guest = await getGuestBySlug(parsed.data.inviteSlug);
   if (!guest) {
     return NextResponse.json(
       { error: "This invitation link is not valid." },

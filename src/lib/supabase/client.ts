@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { RsvpRecord } from "@/types/wedding";
+import type { RsvpRecord, GuestRecord } from "@/types/wedding";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -25,6 +25,15 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<RsvpRecord>;
+      };
+      guests: {
+        Row: GuestRecord;
+        Insert: Omit<GuestRecord, "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<GuestRecord>;
       };
     };
   };
