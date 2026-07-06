@@ -19,7 +19,15 @@ const statusStyles = {
   declining: "bg-rose-50 text-rose-700",
 } as const;
 
-function CopyLinkButton({ url }: { url: string }) {
+function CopyLinkButton({
+  url,
+  className,
+  fullWidth = false,
+}: {
+  url: string;
+  className?: string;
+  fullWidth?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
@@ -33,10 +41,164 @@ function CopyLinkButton({ url }: { url: string }) {
   };
 
   return (
-    <Button type="button" variant="ghost" size="sm" onClick={onCopy}>
+    <Button
+      type="button"
+      variant={fullWidth ? "outline" : "ghost"}
+      size="sm"
+      onClick={onCopy}
+      className={cn(fullWidth && "w-full", className)}
+    >
       {copied ? <Check className="text-emerald-600" /> : <Copy />}
-      {copied ? "Copied" : "Copy"}
+      {copied ? "Copied" : "Copy invite link"}
     </Button>
+  );
+}
+
+function GuestOpenedBadge({ guest }: { guest: AdminGuestRow }) {
+  if (!guest.inviteOpened) {
+    return (
+      <span className="inline-flex rounded-full bg-black/[0.04] px-2.5 py-1 text-xs font-medium text-text/50">
+        Not opened
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700">
+      Opened
+    </span>
+  );
+}
+
+function GuestActionButtons({
+  guest,
+  onEdit,
+  onResetRsvp,
+  onDelete,
+  resettingId,
+  deletingId,
+  compact = false,
+}: {
+  guest: AdminGuestRow;
+  onEdit: (guest: AdminGuestRow) => void;
+  onResetRsvp: (guest: AdminGuestRow) => void;
+  onDelete: (guest: AdminGuestRow) => void;
+  resettingId: string | null;
+  deletingId: string | null;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-1",
+        compact && "gap-2 [&_button]:flex-1 [&_button]:justify-center",
+      )}
+    >
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => onEdit(guest)}
+      >
+        <Pencil />
+        Edit
+      </Button>
+      {guest.rsvp && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => onResetRsvp(guest)}
+          disabled={resettingId === guest.id}
+        >
+          <RotateCcw />
+          Reset
+        </Button>
+      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => onDelete(guest)}
+        disabled={deletingId === guest.id}
+      >
+        <Trash2 />
+        Delete
+      </Button>
+    </div>
+  );
+}
+
+function AdminGuestCard({
+  guest,
+  onEdit,
+  onResetRsvp,
+  onDelete,
+  resettingId,
+  deletingId,
+}: {
+  guest: AdminGuestRow;
+  onEdit: (guest: AdminGuestRow) => void;
+  onResetRsvp: (guest: AdminGuestRow) => void;
+  onDelete: (guest: AdminGuestRow) => void;
+  resettingId: string | null;
+  deletingId: string | null;
+}) {
+  return (
+    <article className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h4 className="font-medium text-text">{guest.fullName}</h4>
+          <p className="mt-0.5 text-xs text-text/50">{guest.slug}</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+          Max {guest.maxGuests}
+        </span>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <span
+          className={cn(
+            "inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize",
+            statusStyles[guest.status],
+          )}
+        >
+          {guest.status}
+        </span>
+        <GuestOpenedBadge guest={guest} />
+      </div>
+
+      {guest.firstOpenedAt && (
+        <p className="mt-2 text-xs text-text/50">
+          First opened{" "}
+          {new Date(guest.firstOpenedAt).toLocaleString("en-PH", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })}
+        </p>
+      )}
+
+      <div className="mt-4 rounded-xl border border-primary/10 bg-[#f8fafc] p-3">
+        <p className="break-all text-xs leading-relaxed text-text/60">
+          {guest.inviteUrl}
+        </p>
+        <div className="mt-3">
+          <CopyLinkButton url={guest.inviteUrl} fullWidth />
+        </div>
+      </div>
+
+      <div className="mt-4 border-t border-black/5 pt-3">
+        <GuestActionButtons
+          guest={guest}
+          onEdit={onEdit}
+          onResetRsvp={onResetRsvp}
+          onDelete={onDelete}
+          resettingId={resettingId}
+          deletingId={deletingId}
+          compact
+        />
+      </div>
+    </article>
   );
 }
 
@@ -149,10 +311,15 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
     }
   };
 
+  const emptyMessage =
+    guests.length === 0
+      ? "No guests yet. Add your first guest to create an invite link."
+      : "No guests match your filters.";
+
   return (
     <>
       <section className="rounded-2xl border border-white/70 bg-white/80 shadow-sm">
-        <div className="border-b border-black/5 px-6 py-5">
+        <div className="border-b border-black/5 px-4 py-5 sm:px-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="font-serif text-xl font-medium text-text">
@@ -207,7 +374,25 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
           )}
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="space-y-3 p-4 lg:hidden">
+          {filteredGuests.length === 0 ? (
+            <p className="py-10 text-center text-sm text-text/50">{emptyMessage}</p>
+          ) : (
+            filteredGuests.map((guest) => (
+              <AdminGuestCard
+                key={guest.id}
+                guest={guest}
+                onEdit={openEditDialog}
+                onResetRsvp={onResetRsvp}
+                onDelete={onDelete}
+                resettingId={resettingId}
+                deletingId={deletingId}
+              />
+            ))
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto lg:block">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-black/5 bg-black/[0.02] text-text/60">
               <tr>
@@ -223,9 +408,7 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
               {filteredGuests.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-text/50">
-                    {guests.length === 0
-                      ? "No guests yet. Add your first guest to create an invite link."
-                      : "No guests match your filters."}
+                    {emptyMessage}
                   </td>
                 </tr>
               ) : (
@@ -273,44 +456,21 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                       )}
                     </td>
                     <td className="px-6 py-4">{guest.maxGuests}</td>
-                    <td className="max-w-xs truncate px-6 py-4 text-text/70">
-                      {guest.inviteUrl}
+                    <td className="max-w-xs px-6 py-4">
+                      <p className="truncate text-text/70">{guest.inviteUrl}</p>
+                      <div className="mt-2">
+                        <CopyLinkButton url={guest.inviteUrl} />
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex flex-wrap items-center gap-1">
-                        <CopyLinkButton url={guest.inviteUrl} />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEditDialog(guest)}
-                        >
-                          <Pencil />
-                          Edit
-                        </Button>
-                        {guest.rsvp && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onResetRsvp(guest)}
-                            disabled={resettingId === guest.id}
-                          >
-                            <RotateCcw />
-                            Reset RSVP
-                          </Button>
-                        )}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDelete(guest)}
-                          disabled={deletingId === guest.id}
-                        >
-                          <Trash2 />
-                          Delete
-                        </Button>
-                      </div>
+                      <GuestActionButtons
+                        guest={guest}
+                        onEdit={openEditDialog}
+                        onResetRsvp={onResetRsvp}
+                        onDelete={onDelete}
+                        resettingId={resettingId}
+                        deletingId={deletingId}
+                      />
                     </td>
                   </tr>
                 ))
