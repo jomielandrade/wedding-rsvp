@@ -14,7 +14,7 @@ interface BankCardProps {
 
 export function BankCard({ bank, delay = 0 }: BankCardProps) {
   return (
-    <FadeUp delay={delay}>
+    <FadeUp delay={delay} className="w-full max-w-sm">
       <Card className="h-full">
         <CardHeader className="text-center">
           <div

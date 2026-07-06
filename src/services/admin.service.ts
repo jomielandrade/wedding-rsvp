@@ -92,7 +92,6 @@ export function toExportRows(guests: AdminGuestRow[]) {
     Email: guest.rsvp?.email ?? "",
     "Guest Count": guest.rsvp?.guest_count ?? "",
     Companions: guest.rsvp?.companion_names?.join(", ") ?? "",
-    "Song Request": guest.rsvp?.song_request ?? "",
     Message: guest.rsvp?.message ?? "",
     "Responded At": guest.rsvp?.created_at
       ? new Date(guest.rsvp.created_at).toLocaleString("en-PH")

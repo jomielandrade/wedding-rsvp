@@ -22,7 +22,6 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
         rsvp.mobile_number,
         rsvp.email ?? "",
         ...(rsvp.companion_names ?? []),
-        rsvp.song_request ?? "",
         rsvp.message ?? "",
       ].some((value) => value.toLowerCase().includes(normalized)),
     );
@@ -54,7 +53,6 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
               <th className="px-6 py-3 font-medium">Contact</th>
               <th className="px-6 py-3 font-medium">Guests</th>
               <th className="px-6 py-3 font-medium">Companions</th>
-              <th className="px-6 py-3 font-medium">Song</th>
               <th className="px-6 py-3 font-medium">Message</th>
               <th className="px-6 py-3 font-medium">Submitted</th>
             </tr>
@@ -62,7 +60,7 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
           <tbody>
             {filteredRsvps.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-10 text-center text-text/50">
+                <td colSpan={7} className="px-6 py-10 text-center text-text/50">
                   {rsvps.length === 0
                     ? "No RSVPs submitted yet."
                     : "No responses match your search."}
@@ -99,10 +97,7 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
                       ? rsvp.companion_names.join(", ")
                       : "—"}
                   </td>
-                  <td className="max-w-[12rem] px-6 py-4 text-text/70">
-                    {rsvp.song_request || "—"}
-                  </td>
-                  <td className="max-w-[16rem] px-6 py-4 text-text/70">
+                  <td className="max-w-[20rem] px-6 py-4 text-text/70">
                     {rsvp.message || "—"}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-text/70">
