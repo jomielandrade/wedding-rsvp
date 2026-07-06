@@ -4,11 +4,12 @@ export type GuestRsvpStatus = "pending" | AttendanceStatus;
 
 export interface RsvpStats {
   totalInvited: number;
+  invitedHeadcount: number;
   totalResponded: number;
   attending: number;
   declining: number;
   pending: number;
-  totalGuestCount: number;
+  confirmedHeadcount: number;
   responseRate: number;
 }
 

@@ -76,9 +76,15 @@ export default async function AdminDashboardPage() {
               <dd className="font-medium text-text">{dashboard.stats.responseRate}%</dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-black/5 pb-3">
-              <dt className="text-text/60">Total headcount (attending)</dt>
+              <dt className="text-text/60">Confirmed attending</dt>
               <dd className="font-medium text-text">
-                {dashboard.stats.totalGuestCount}
+                {dashboard.stats.confirmedHeadcount}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4 border-b border-black/5 pb-3">
+              <dt className="text-text/60">Invited headcount</dt>
+              <dd className="font-medium text-text">
+                {dashboard.stats.invitedHeadcount}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
