@@ -77,6 +77,8 @@ export interface WeddingScheduleItem {
 export interface GuestInvite {
   slug: string;
   fullName: string;
+  /** Max guests allowed on this invite (defaults to 1) */
+  maxGuests?: number;
 }
 
 export interface WeddingConfig {
@@ -110,6 +112,7 @@ export interface WeddingConfig {
 
 export interface RsvpRecord {
   id: string;
+  invite_slug: string;
   full_name: string;
   mobile_number: string;
   email: string | null;
@@ -121,7 +124,7 @@ export interface RsvpRecord {
 }
 
 export interface RsvpFormData {
-  fullName: string;
+  inviteSlug: string;
   mobileNumber: string;
   email?: string;
   guestCount: number;
