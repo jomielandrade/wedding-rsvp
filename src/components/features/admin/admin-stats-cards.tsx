@@ -5,7 +5,14 @@ interface AdminStatsCardsProps {
   stats: RsvpStats;
 }
 
-const cards = [
+const cards: Array<{
+  key: "attending" | "declining" | "pending" | "invitedHeadcount";
+  label: string;
+  hint?: string;
+  icon: typeof CheckCircle2;
+  color: string;
+  bg: string;
+}> = [
   {
     key: "attending",
     label: "Attending",
@@ -28,20 +35,21 @@ const cards = [
     bg: "bg-amber-50",
   },
   {
-    key: "totalGuestCount",
+    key: "invitedHeadcount",
     label: "Total guests",
+    hint: "Invited incl. plus ones",
     icon: Users,
     color: "text-primary",
     bg: "bg-primary/10",
   },
-] as const;
+];
 
 export function AdminStatsCards({ stats }: AdminStatsCardsProps) {
-  const values: Record<(typeof cards)[number]["key"], number> = {
+  const values = {
     attending: stats.attending,
     declining: stats.declining,
     pending: stats.pending,
-    totalGuestCount: stats.totalGuestCount,
+    invitedHeadcount: stats.invitedHeadcount,
   };
 
   return (
@@ -56,6 +64,9 @@ export function AdminStatsCards({ stats }: AdminStatsCardsProps) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm text-text/60">{card.label}</p>
+                {card.hint ? (
+                  <p className="mt-0.5 text-xs text-text/45">{card.hint}</p>
+                ) : null}
                 <p className="mt-2 font-serif text-3xl font-medium text-text">
                   {values[card.key]}
                 </p>

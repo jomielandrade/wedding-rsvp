@@ -9,23 +9,29 @@ import type {
 import type { GuestRecord, RsvpRecord } from "@/types/wedding";
 
 export function buildRsvpStats(
+  guests: GuestRecord[],
   rsvps: RsvpRecord[],
-  totalInvited: number,
 ): RsvpStats {
+  const totalInvited = guests.length;
+  const invitedHeadcount = guests.reduce(
+    (sum, guest) => sum + guest.max_guests,
+    0,
+  );
   const attending = rsvps.filter((r) => r.attendance === "attending").length;
   const declining = rsvps.filter((r) => r.attendance === "declining").length;
   const totalResponded = attending + declining;
-  const totalGuestCount = rsvps
+  const confirmedHeadcount = rsvps
     .filter((r) => r.attendance === "attending")
     .reduce((sum, r) => sum + r.guest_count, 0);
 
   return {
     totalInvited,
+    invitedHeadcount,
     totalResponded,
     attending,
     declining,
     pending: Math.max(totalInvited - totalResponded, 0),
-    totalGuestCount,
+    confirmedHeadcount,
     responseRate:
       totalInvited > 0
         ? Math.round((totalResponded / totalInvited) * 100)
@@ -74,7 +80,7 @@ export async function getAdminDashboardData(
 
   const guestRecords = guests ?? [];
   const records = rsvps ?? [];
-  const stats = buildRsvpStats(records, guestRecords.length);
+  const stats = buildRsvpStats(guestRecords, records);
   const guestRows = buildGuestRows(guestRecords, records, siteUrl);
 
   return { stats, guests: guestRows, rsvps: records };
