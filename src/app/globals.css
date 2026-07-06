@@ -71,11 +71,11 @@ body {
 }
 
 .section-padding {
-  @apply px-6 py-20 md:px-8 md:py-28 lg:px-12;
+  @apply scroll-mt-24 px-6 py-20 md:px-8 md:py-28 lg:px-12;
 }
 
 .glass-card {
-  @apply rounded-2xl border border-white/60 bg-white/50 shadow-sm backdrop-blur-md;
+  @apply rounded-2xl border border-white/60 bg-white/50 shadow-sm backdrop-blur-md transition-shadow duration-300 hover:shadow-md;
 }
 
 :focus-visible {

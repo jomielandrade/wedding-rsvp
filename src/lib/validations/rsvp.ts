@@ -25,8 +25,7 @@ export const rsvpSchema = z
       .max(10, "Maximum 10 guests"),
     companionNames: z.array(z.string()),
     attendance: z.enum(["attending", "declining"]),
-    songRequest: z.string().trim().max(200, "Song request is too long").optional(),
-    message: z.string().trim().max(500, "Message is too long").optional(),
+    message: z.string().trim().max(1000, "Message is too long").optional(),
   })
   .superRefine((data, ctx) => {
     if (data.attendance !== "attending" || data.guestCount <= 1) return;
@@ -63,6 +62,5 @@ export const rsvpDefaultValues: RsvpFormValues = {
   guestCount: 1,
   companionNames: [],
   attendance: "attending",
-  songRequest: "",
   message: "",
 };

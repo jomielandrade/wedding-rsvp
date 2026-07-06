@@ -138,6 +138,5 @@ export interface RsvpFormData {
   email?: string;
   guestCount: number;
   attendance: AttendanceStatus;
-  songRequest?: string;
   message?: string;
 }

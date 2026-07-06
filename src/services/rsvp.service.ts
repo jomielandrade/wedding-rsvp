@@ -32,7 +32,7 @@ export function toRsvpInsertPayload(
             .map((name) => name.trim())
             .filter(Boolean)
         : [],
-    song_request: data.songRequest?.trim() || null,
+    song_request: null,
     message: data.message?.trim() || null,
   };
 }

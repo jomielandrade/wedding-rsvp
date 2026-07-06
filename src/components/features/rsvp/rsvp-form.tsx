@@ -117,7 +117,7 @@ export function RsvpForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="glass-card mx-auto max-w-2xl space-y-6 px-6 py-8 md:px-10 md:py-10"
+      className="glass-card mx-auto max-w-2xl space-y-5 px-6 py-8 md:space-y-6 md:px-10 md:py-10"
       noValidate
     >
       <input type="hidden" {...register("inviteSlug")} />
@@ -270,27 +270,13 @@ export function RsvpForm({
         </div>
       )}
 
-      {isAttending && (
-        <div className="space-y-2">
-          <Label htmlFor="songRequest">Song Request (Optional)</Label>
-          <Input
-            id="songRequest"
-            placeholder="What song would you love to hear?"
-            aria-invalid={!!errors.songRequest}
-            {...register("songRequest")}
-          />
-          {errors.songRequest && (
-            <p className="text-sm text-red-500">{errors.songRequest.message}</p>
-          )}
-        </div>
-      )}
-
       <div className="space-y-2">
         <Label htmlFor="message">Message for the Couple (Optional)</Label>
         <Textarea
           id="message"
-          rows={4}
-          placeholder="Share your well wishes..."
+          rows={6}
+          placeholder="Share your well wishes, prayers, or a note for us..."
+          className="min-h-[160px] resize-y"
           aria-invalid={!!errors.message}
           {...register("message")}
         />
