@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { Loader2 } from "lucide-react";
@@ -42,6 +42,7 @@ export function RsvpForm({
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<RsvpFormValues>({
     resolver: zodResolver(rsvpSchema),
@@ -52,7 +53,27 @@ export function RsvpForm({
   });
 
   const attendance = watch("attendance");
+  const guestCount = watch("guestCount");
   const isAttending = attendance === "attending";
+  const companionCount = isAttending ? Math.max(0, guestCount - 1) : 0;
+
+  useEffect(() => {
+    const current = getValues("companionNames") ?? [];
+
+    if (companionCount === 0) {
+      if (current.length > 0) {
+        setValue("companionNames", []);
+      }
+      return;
+    }
+
+    if (current.length === companionCount) return;
+
+    setValue(
+      "companionNames",
+      Array.from({ length: companionCount }, (_, index) => current[index] ?? ""),
+    );
+  }, [companionCount, getValues, setValue]);
 
   const onSubmit = async (data: RsvpFormValues) => {
     setSubmitError(null);
@@ -166,6 +187,7 @@ export function RsvpForm({
                     field.onChange(option.value);
                     if (option.value === "declining") {
                       setValue("guestCount", 1);
+                      setValue("companionNames", []);
                     }
                   }}
                   className={cn(
@@ -198,14 +220,53 @@ export function RsvpForm({
             aria-invalid={!!errors.guestCount}
             {...register("guestCount", { valueAsNumber: true })}
           />
-          {maxGuests === 1 && (
+          {maxGuests === 1 ? (
             <p className="text-xs text-text/50">
               This invitation is for one guest.
+            </p>
+          ) : (
+            <p className="text-xs text-text/50">
+              Include yourself in the total count (max {maxGuests}).
             </p>
           )}
           {errors.guestCount && (
             <p className="text-sm text-red-500">{errors.guestCount.message}</p>
           )}
+        </div>
+      )}
+
+      {isAttending && companionCount > 0 && (
+        <div className="space-y-3">
+          <div>
+            <Label>
+              {companionCount === 1 ? "Companion name *" : "Companion names *"}
+            </Label>
+            <p className="mt-1 text-xs text-text/50">
+              Please enter the full name{companionCount === 1 ? "" : "s"} of{" "}
+              {companionCount === 1 ? "your companion" : "your companions"}.
+            </p>
+          </div>
+          {Array.from({ length: companionCount }).map((_, index) => (
+            <div key={index} className="space-y-2">
+              <Label htmlFor={`companion-${index}`}>
+                {companionCount === 1
+                  ? "Companion full name"
+                  : `Companion ${index + 1} full name`}
+              </Label>
+              <Input
+                id={`companion-${index}`}
+                autoComplete="name"
+                placeholder="Full name"
+                aria-invalid={!!errors.companionNames?.[index]}
+                {...register(`companionNames.${index}` as const)}
+              />
+              {errors.companionNames?.[index] && (
+                <p className="text-sm text-red-500">
+                  {errors.companionNames[index]?.message}
+                </p>
+              )}
+            </div>
+          ))}
         </div>
       )}
 

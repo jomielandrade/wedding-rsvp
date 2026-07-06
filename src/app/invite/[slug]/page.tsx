@@ -7,7 +7,7 @@ import { GodparentsSection } from "@/components/sections/godparents-section";
 import { RsvpSection } from "@/components/sections/rsvp-section";
 import { StorySection } from "@/components/sections/story-section";
 import { WeddingDetailsSection } from "@/components/sections/wedding-details-section";
-import { weddingConfig } from "@/config/wedding";
+import { getGuestBySlug } from "@/lib/guests";
 import {
   findRsvpByInviteSlug,
   isSupabaseConfigured,
@@ -20,13 +20,9 @@ interface InvitePageProps {
 
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  return weddingConfig.guests.map((guest) => ({ slug: guest.slug }));
-}
-
 export default async function InvitePage({ params }: InvitePageProps) {
   const { slug } = await params;
-  const guest = weddingConfig.guests.find((g) => g.slug === slug);
+  const guest = await getGuestBySlug(slug);
 
   if (!guest) {
     notFound();

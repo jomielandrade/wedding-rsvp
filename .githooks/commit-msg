@@ -1,0 +1,12 @@
+#!/bin/sh
+# Strip Cursor attribution lines from commit messages.
+msg="$1"
+[ -f "$msg" ] || exit 0
+tmp="${msg}.$$"
+awk '
+/^[[:space:]]*Co-authored-by:[[:space:]]*Cursor/ { next }
+/^[[:space:]]*[Mm]ade-with:[[:space:]]*[Cc]ursor[[:space:]]*$/ { next }
+/^[[:space:]]*[Mm]ade with [Cc]ursor[[:space:]]*$/ { next }
+/^[[:space:]]*[Mm]ade with \[Cursor\]/ { next }
+{ print }
+' "$msg" > "$tmp" && mv "$tmp" "$msg"

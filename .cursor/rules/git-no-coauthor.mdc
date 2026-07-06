@@ -1,0 +1,19 @@
+---
+description: Never add Cursor attribution to git commits or PRs
+alwaysApply: true
+---
+
+# Git — no Cursor attribution
+
+Never include any of these in commits, pushes, or pull requests:
+
+- `Co-authored-by: Cursor`
+- `Made-with: Cursor`
+- `Made with Cursor`
+- `Made with [Cursor](...)`
+
+If a hook or tool adds them, strip with `git commit-tree` and `--force-with-lease`, or enable `.githooks/commit-msg`:
+
+```bash
+git config core.hooksPath .githooks
+```

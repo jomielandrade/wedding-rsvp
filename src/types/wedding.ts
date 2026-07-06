@@ -81,6 +81,15 @@ export interface GuestInvite {
   maxGuests?: number;
 }
 
+export interface GuestRecord {
+  id: string;
+  slug: string;
+  full_name: string;
+  max_guests: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface WeddingConfig {
   couple: CoupleInfo;
   weddingDate: string;
@@ -107,7 +116,6 @@ export interface WeddingConfig {
     deadline: string;
     emailConfirmation: boolean;
   };
-  guests: GuestInvite[];
 }
 
 export interface RsvpRecord {
@@ -118,6 +126,7 @@ export interface RsvpRecord {
   email: string | null;
   attendance: AttendanceStatus;
   guest_count: number;
+  companion_names: string[];
   song_request: string | null;
   message: string | null;
   created_at: string;

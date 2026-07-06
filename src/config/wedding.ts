@@ -249,8 +249,4 @@ export const weddingConfig: WeddingConfig = {
     deadline: "2026-06-15",
     emailConfirmation: false,
   },
-  guests: [
-    { slug: "john-doe", fullName: "John Doe" },
-    { slug: "jane-smith", fullName: "Jane Smith" },
-  ],
 };
