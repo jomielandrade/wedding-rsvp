@@ -49,6 +49,10 @@ export function buildGuestRows(
       maxGuests: guest.max_guests,
       inviteUrl: getInviteUrl(guest.slug, siteUrl),
       status: rsvp?.attendance ?? "pending",
+      inviteOpened: Boolean(guest.first_opened_at),
+      firstOpenedAt: guest.first_opened_at,
+      lastOpenedAt: guest.last_opened_at,
+      openCount: guest.open_count ?? 0,
       rsvp,
     };
   });
@@ -88,6 +92,11 @@ export function toExportRows(guests: AdminGuestRow[]) {
           ? "Attending"
           : "Declining",
     "Invite URL": guest.inviteUrl,
+    "Invite Opened": guest.inviteOpened ? "Yes" : "No",
+    "First Opened": guest.firstOpenedAt
+      ? new Date(guest.firstOpenedAt).toLocaleString("en-PH")
+      : "",
+    "Open Count": guest.openCount,
     Mobile: guest.rsvp?.mobile_number ?? "",
     Email: guest.rsvp?.email ?? "",
     "Guest Count": guest.rsvp?.guest_count ?? "",
