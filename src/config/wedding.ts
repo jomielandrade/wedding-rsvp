@@ -78,7 +78,7 @@ export const weddingConfig: WeddingConfig = {
     },
     {
       title: "Ninang",
-      names: ["Rowena Awitin", "Mila Hernandez"],
+      names: ["Rowena Awitin", "Emilia Hernandez"],
     },
   ],
   gallery: [
