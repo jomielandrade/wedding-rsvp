@@ -231,7 +231,7 @@ export const weddingConfig: WeddingConfig = {
         id: "gotyme",
         bankName: "GoTyme Bank",
         accountName: "Rojiely Palma",
-        accountNumber: "XXXX XXXX XXXX",
+        accountNumber: "0165 1520 0676",
         qrImage: "/images/banks/gotyme.JPG",
         enabled: true,
       },
