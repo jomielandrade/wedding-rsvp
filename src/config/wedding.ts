@@ -9,7 +9,7 @@ export const weddingConfig: WeddingConfig = {
   },
   weddingDate: "2026-07-15T01:00:00.000Z",
   weddingDateDisplay: "July 15, 2026",
-  weddingTime: "9:00 AM",
+  weddingTime: "10:00 AM",
   timezone: "Asia/Manila",
   location: "Metro Manila, Philippines",
   ceremony: {
@@ -26,7 +26,7 @@ export const weddingConfig: WeddingConfig = {
   },
   schedule: [
     {
-      time: "9:00 AM",
+      time: "10:00 AM",
       title: "Civil Wedding Ceremony",
       description: "Officiated by the Mayor of Pateros",
     },
