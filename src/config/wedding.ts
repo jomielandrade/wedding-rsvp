@@ -9,13 +9,13 @@ export const weddingConfig: WeddingConfig = {
   },
   weddingDate: "2026-07-15T01:00:00.000Z",
   weddingDateDisplay: "July 15, 2026",
-  weddingTime: "9:00 AM",
+  weddingTime: "10:00 AM",
   timezone: "Asia/Manila",
   location: "Metro Manila, Philippines",
   ceremony: {
     name: "Pateros Municipal Hall",
     address: "Pateros, Metro Manila, Philippines",
-    time: "9:00 AM",
+    time: "10:00 AM",
     mapsUrl: "https://maps.app.goo.gl/sFGE4xbiGvXrCdk96",
   },
   reception: {
@@ -26,7 +26,7 @@ export const weddingConfig: WeddingConfig = {
   },
   schedule: [
     {
-      time: "9:00 AM",
+      time: "10:00 AM",
       title: "Civil Wedding Ceremony",
       description: "Officiated by the Mayor of Pateros",
     },
@@ -202,7 +202,7 @@ export const weddingConfig: WeddingConfig = {
       id: "arrival-time",
       question: "What time should I arrive?",
       answer:
-        "Please arrive 15–30 minutes before the ceremony begins at 9:00 AM. This allows time for seating and ensures we can start on schedule.",
+        "Please arrive 15–30 minutes before the ceremony begins at 10:00 AM. This allows time for seating and ensures we can start on schedule.",
     },
     {
       id: "parking",

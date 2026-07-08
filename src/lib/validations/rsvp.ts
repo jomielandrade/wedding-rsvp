@@ -22,7 +22,7 @@ export const rsvpSchema = z
       .number()
       .int()
       .min(1, "At least 1 guest")
-      .max(10, "Maximum 10 guests"),
+      .max(20, "Maximum 20 guests"),
     companionNames: z.array(z.string()),
     attendance: z.enum(["attending", "declining"]),
     message: z.string().trim().max(1000, "Message is too long").optional(),
