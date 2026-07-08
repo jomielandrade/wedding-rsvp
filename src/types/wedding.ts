@@ -140,7 +140,6 @@ export interface RsvpRecord {
   attendance: AttendanceStatus;
   guest_count: number;
   companion_names: string[];
-  song_request: string | null;
   message: string | null;
   created_at: string;
 }

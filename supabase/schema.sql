@@ -12,7 +12,6 @@ create table if not exists public.rsvp (
   attendance text not null check (attendance in ('attending', 'declining')),
   guest_count integer not null default 1 check (guest_count >= 0 and guest_count <= 20),
   companion_names text[] not null default '{}',
-  song_request text,
   message text,
   created_at timestamptz not null default now()
 );
@@ -37,6 +36,20 @@ create table if not exists public.guests (
 create index if not exists guests_slug_idx on public.guests (slug);
 create index if not exists guests_full_name_idx on public.guests (full_name);
 create index if not exists guests_first_opened_at_idx on public.guests (first_opened_at desc nulls last);
+
+-- Atomic invite-open counter (see migration 006).
+create or replace function public.record_invite_open(p_slug text)
+returns void
+language sql
+as $$
+  update public.guests
+  set
+    last_opened_at = now(),
+    open_count = open_count + 1,
+    first_opened_at = coalesce(first_opened_at, now()),
+    updated_at = now()
+  where slug = p_slug;
+$$;
 
 alter table public.guests enable row level security;
 
