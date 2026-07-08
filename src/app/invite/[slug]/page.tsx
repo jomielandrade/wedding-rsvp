@@ -12,7 +12,6 @@ import { StorySection } from "@/components/sections/story-section";
 import { WeddingDetailsSection } from "@/components/sections/wedding-details-section";
 import { weddingConfig } from "@/config/wedding";
 import { getGuestBySlug } from "@/lib/guests";
-import { recordInviteOpen } from "@/services/guest.service";
 import {
   findRsvpByInviteSlug,
   isSupabaseConfigured,
@@ -68,8 +67,6 @@ export default async function InvitePage({ params }: InvitePageProps) {
     notFound();
   }
 
-  await recordInviteOpen(slug);
-
   let existingAttendance: AttendanceStatus | null = null;
 
   if (isSupabaseConfigured()) {
@@ -80,7 +77,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
   }
 
   return (
-    <InvitationShell guestName={guest.fullName}>
+    <InvitationShell guestName={guest.fullName} inviteSlug={guest.slug}>
       <CountdownSection />
       <StorySection />
       <WeddingDetailsSection />
