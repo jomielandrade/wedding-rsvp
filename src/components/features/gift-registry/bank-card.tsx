@@ -15,28 +15,29 @@ interface BankCardProps {
 
 export function BankCard({ bank, delay = 0 }: BankCardProps) {
   return (
-    <FadeUp delay={delay} className="w-full max-w-sm">
-      <Card className="h-full">
-        <CardHeader className="text-center">
+    <FadeUp delay={delay} className="w-full">
+      <Card className="h-full p-5 sm:p-6">
+        <CardHeader className="pb-3 text-center">
           <div
-            className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10"
+            className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10"
             aria-hidden="true"
           >
-            <Building2 className="h-5 w-5 text-primary" />
+            <Building2 className="h-4 w-4 text-primary" />
           </div>
-          <CardTitle className="text-xl">{bank.bankName}</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">{bank.bankName}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-4">
           {bank.qrImage && (
             <div className="space-y-3">
-              <div className="mx-auto w-fit overflow-hidden rounded-xl border border-primary/10 bg-white p-3">
+              <div className="overflow-hidden rounded-2xl border border-primary/10 bg-white shadow-sm">
                 <Image
                   src={bank.qrImage}
                   alt={`${bank.bankName} QR code`}
-                  width={200}
-                  height={200}
+                  width={640}
+                  height={800}
                   unoptimized
-                  className="h-48 w-48 object-contain"
+                  className="h-auto w-full object-contain"
+                  sizes="(max-width: 768px) 92vw, 448px"
                 />
               </div>
               <QrDownloadButton src={bank.qrImage} bankName={bank.bankName} />

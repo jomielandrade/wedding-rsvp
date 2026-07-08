@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Check,
   Copy,
   Eye,
+  MoreVertical,
   Pencil,
   Plus,
   RotateCcw,
@@ -116,7 +117,7 @@ function CopyLinkButton({
   );
 }
 
-function GuestActionButtons({
+function GuestActionsMenu({
   guest,
   onMarkStatus,
   onEdit,
@@ -125,7 +126,6 @@ function GuestActionButtons({
   markingId,
   resettingId,
   deletingId,
-  compact = false,
 }: {
   guest: AdminGuestRow;
   onMarkStatus: (
@@ -138,70 +138,162 @@ function GuestActionButtons({
   markingId: string | null;
   resettingId: string | null;
   deletingId: string | null;
-  compact?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(
+    null,
+  );
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const busy =
+    markingId === guest.id ||
+    resettingId === guest.id ||
+    deletingId === guest.id;
+  const canReset = Boolean(guest.rsvp) || guest.statusSource === "override";
+
+  const closeMenu = () => {
+    setOpen(false);
+    setMenuPos(null);
+  };
+
+  const toggleMenu = () => {
+    if (open) {
+      closeMenu();
+      return;
+    }
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setMenuPos({
+      top: rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    });
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        menuRef.current?.contains(target) ||
+        triggerRef.current?.contains(target)
+      ) {
+        return;
+      }
+      closeMenu();
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+
+    const onReposition = () => closeMenu();
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("scroll", onReposition, true);
+    window.addEventListener("resize", onReposition);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", onReposition, true);
+      window.removeEventListener("resize", onReposition);
+    };
+  }, [open]);
+
   return (
-    <div
-      className={cn(
-        "flex flex-wrap items-center gap-1",
-        compact && "gap-2 [&_button]:flex-1 [&_button]:justify-center",
-      )}
-    >
-      {guest.status === "pending" && (
-        <>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onMarkStatus(guest, "attending")}
-            disabled={markingId === guest.id}
-          >
-            <ThumbsUp />
-            Attending
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onMarkStatus(guest, "declining")}
-            disabled={markingId === guest.id}
-          >
-            <ThumbsDown />
-            Declining
-          </Button>
-        </>
-      )}
+    <div className="relative inline-flex justify-end">
       <Button
+        ref={triggerRef}
         type="button"
         variant="ghost"
-        size="sm"
-        onClick={() => onEdit(guest)}
+        size="icon"
+        aria-label={`Actions for ${guest.fullName}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        disabled={busy}
+        onClick={toggleMenu}
       >
-        <Pencil />
-        Edit
+        <MoreVertical className="h-4 w-4" />
       </Button>
-      {guest.rsvp && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => onResetRsvp(guest)}
-          disabled={resettingId === guest.id}
+
+      {open && menuPos && (
+        <div
+          ref={menuRef}
+          role="menu"
+          className="fixed z-50 w-48 overflow-hidden rounded-xl border border-black/10 bg-white py-1 shadow-lg"
+          style={{ top: menuPos.top, right: menuPos.right }}
         >
-          <RotateCcw />
-          Reset
-        </Button>
+          {guest.status === "pending" && (
+            <>
+              <button
+                type="button"
+                role="menuitem"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text hover:bg-black/[0.04]"
+                onClick={() => {
+                  closeMenu();
+                  onMarkStatus(guest, "attending");
+                }}
+              >
+                <ThumbsUp className="h-4 w-4" />
+                Mark attending
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text hover:bg-black/[0.04]"
+                onClick={() => {
+                  closeMenu();
+                  onMarkStatus(guest, "declining");
+                }}
+              >
+                <ThumbsDown className="h-4 w-4" />
+                Mark declining
+              </button>
+              <div className="my-1 border-t border-black/5" />
+            </>
+          )}
+          <button
+            type="button"
+            role="menuitem"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text hover:bg-black/[0.04]"
+            onClick={() => {
+              closeMenu();
+              onEdit(guest);
+            }}
+          >
+            <Pencil className="h-4 w-4" />
+            Edit
+          </button>
+          {canReset && (
+            <button
+              type="button"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text hover:bg-black/[0.04]"
+              onClick={() => {
+                closeMenu();
+                onResetRsvp(guest);
+              }}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </button>
+          )}
+          <button
+            type="button"
+            role="menuitem"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-rose-700 hover:bg-rose-50"
+            onClick={() => {
+              closeMenu();
+              onDelete(guest);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </button>
+        </div>
       )}
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => onDelete(guest)}
-        disabled={deletingId === guest.id}
-      >
-        <Trash2 />
-        Delete
-      </Button>
     </div>
   );
 }
@@ -237,9 +329,21 @@ function AdminGuestCard({
           <h4 className="font-medium text-text">{guest.fullName}</h4>
           <p className="mt-0.5 text-xs text-text/50">{guest.slug}</p>
         </div>
-        <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-          Max {guest.maxGuests}
-        </span>
+        <div className="flex shrink-0 items-center gap-1">
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+            Max {guest.maxGuests}
+          </span>
+          <GuestActionsMenu
+            guest={guest}
+            onMarkStatus={onMarkStatus}
+            onEdit={onEdit}
+            onResetRsvp={onResetRsvp}
+            onDelete={onDelete}
+            markingId={markingId}
+            resettingId={resettingId}
+            deletingId={deletingId}
+          />
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -299,19 +403,6 @@ function AdminGuestCard({
         </div>
       </div>
 
-      <div className="mt-4 border-t border-black/5 pt-3">
-        <GuestActionButtons
-          guest={guest}
-          onMarkStatus={onMarkStatus}
-          onEdit={onEdit}
-          onResetRsvp={onResetRsvp}
-          onDelete={onDelete}
-          markingId={markingId}
-          resettingId={resettingId}
-          deletingId={deletingId}
-          compact
-        />
-      </div>
     </article>
   );
 }
@@ -629,7 +720,7 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                 <th className="px-6 py-3 font-medium">Opened</th>
                 <th className="px-6 py-3 font-medium">Max guests</th>
                 <th className="px-6 py-3 font-medium">Invite link</th>
-                <th className="px-6 py-3 font-medium">Actions</th>
+                <th className="px-6 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -717,8 +808,8 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                         <CopyLinkButton url={guest.inviteUrl} />
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <GuestActionButtons
+                    <td className="px-6 py-4 text-right">
+                      <GuestActionsMenu
                         guest={guest}
                         onMarkStatus={onMarkStatus}
                         onEdit={openEditDialog}

@@ -58,7 +58,7 @@ export function GiftRegistrySection() {
       )}
 
       {activeBanks.length > 0 && (
-        <div className="mx-auto mt-10 flex max-w-5xl flex-wrap justify-center gap-6 md:gap-8">
+        <div className="mx-auto mt-10 grid max-w-3xl gap-6 sm:grid-cols-2 md:gap-8">
           {activeBanks.map((bank, index) => (
             <BankCard key={bank.id} bank={bank} delay={0.1 + index * 0.1} />
           ))}
