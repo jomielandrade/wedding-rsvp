@@ -20,6 +20,8 @@ export interface AdminGuestRow {
   maxGuests: number;
   inviteUrl: string;
   status: GuestRsvpStatus;
+  statusSource: "pending" | "rsvp" | "override";
+  overrideAt: string | null;
   inviteOpened: boolean;
   firstOpenedAt: string | null;
   lastOpenedAt: string | null;

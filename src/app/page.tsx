@@ -1,6 +1,7 @@
 import { InvitationShell } from "@/components/invitation/invitation-shell";
 import { CountdownSection } from "@/components/sections/countdown-section";
 import { DressCodeSection } from "@/components/sections/dress-code-section";
+import { FaqSection } from "@/components/sections/faq-section";
 import { GallerySection } from "@/components/sections/gallery-section";
 import { GiftRegistrySection } from "@/components/sections/gift-registry-section";
 import { GodparentsSection } from "@/components/sections/godparents-section";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <GodparentsSection />
       <GallerySection />
       <GiftRegistrySection />
+      <FaqSection />
     </InvitationShell>
   );
 }

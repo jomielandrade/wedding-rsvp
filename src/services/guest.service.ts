@@ -1,5 +1,6 @@
 import { createServerClient } from "@/lib/supabase/client";
 import type { GuestInvite, GuestRecord } from "@/types/wedding";
+import type { AttendanceStatus } from "@/types/wedding";
 import type { GuestFormValues } from "@/lib/validations/guest";
 
 export function toGuestInvite(record: GuestRecord): GuestInvite {
@@ -72,6 +73,25 @@ export async function updateGuest(id: string, values: GuestFormValues) {
 export async function deleteGuest(id: string) {
   const supabase = createServerClient();
   return supabase.from("guests").delete().eq("id", id);
+}
+
+export async function setGuestStatusOverride(
+  id: string,
+  status: AttendanceStatus | null,
+) {
+  const supabase = createServerClient();
+  const now = new Date().toISOString();
+
+  return supabase
+    .from("guests")
+    .update({
+      status_override: status,
+      status_override_at: status ? now : null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select("*")
+    .single();
 }
 
 export async function recordInviteOpen(slug: string) {

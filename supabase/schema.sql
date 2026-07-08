@@ -26,6 +26,8 @@ create table if not exists public.guests (
   slug text not null unique,
   full_name text not null,
   max_guests integer not null default 1 check (max_guests >= 1 and max_guests <= 20),
+  status_override text check (status_override in ('attending', 'declining')),
+  status_override_at timestamptz,
   first_opened_at timestamptz,
   last_opened_at timestamptz,
   open_count integer not null default 0 check (open_count >= 0),
@@ -35,6 +37,7 @@ create table if not exists public.guests (
 
 create index if not exists guests_slug_idx on public.guests (slug);
 create index if not exists guests_full_name_idx on public.guests (full_name);
+create index if not exists guests_status_override_idx on public.guests (status_override);
 create index if not exists guests_first_opened_at_idx on public.guests (first_opened_at desc nulls last);
 
 -- Atomic invite-open counter (see migration 006).

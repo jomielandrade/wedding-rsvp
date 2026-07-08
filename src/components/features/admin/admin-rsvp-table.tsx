@@ -1,13 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { RsvpRecord } from "@/types/wedding";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface AdminRsvpTableProps {
   rsvps: RsvpRecord[];
 }
+
+const PAGE_SIZE = 10;
 
 function formatSubmittedAt(value: string) {
   return new Date(value).toLocaleString("en-PH", {
@@ -77,8 +80,57 @@ function RsvpCard({ rsvp }: { rsvp: RsvpRecord }) {
   );
 }
 
+function PaginationControls({
+  page,
+  totalPages,
+  totalItems,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  onPageChange: (nextPage: number) => void;
+}) {
+  if (totalItems === 0) return null;
+
+  const from = (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, totalItems);
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-black/5 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p className="text-xs text-text/55 sm:text-sm">
+        Showing {from}-{to} of {totalItems} responses
+      </p>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+        >
+          Previous
+        </Button>
+        <span className="text-xs text-text/60 sm:text-sm">
+          Page {page} / {totalPages}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
 
   const filteredRsvps = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -94,6 +146,17 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
       ].some((value) => value.toLowerCase().includes(normalized)),
     );
   }, [rsvps, query]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRsvps.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedRsvps = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredRsvps.slice(start, start + PAGE_SIZE);
+  }, [filteredRsvps, currentPage]);
 
   const emptyMessage =
     rsvps.length === 0
@@ -118,10 +181,10 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
       </div>
 
       <div className="space-y-3 p-4 lg:hidden">
-        {filteredRsvps.length === 0 ? (
+        {paginatedRsvps.length === 0 ? (
           <p className="py-10 text-center text-sm text-text/50">{emptyMessage}</p>
         ) : (
-          filteredRsvps.map((rsvp) => <RsvpCard key={rsvp.id} rsvp={rsvp} />)
+          paginatedRsvps.map((rsvp) => <RsvpCard key={rsvp.id} rsvp={rsvp} />)
         )}
       </div>
 
@@ -139,14 +202,14 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredRsvps.length === 0 ? (
+            {paginatedRsvps.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-10 text-center text-text/50">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
-              filteredRsvps.map((rsvp) => (
+              paginatedRsvps.map((rsvp) => (
                 <tr key={rsvp.id} className="border-b border-black/5 align-top last:border-0">
                   <td className="px-6 py-4">
                     <div className="font-medium text-text">{rsvp.full_name}</div>
@@ -188,6 +251,13 @@ export function AdminRsvpTable({ rsvps }: AdminRsvpTableProps) {
           </tbody>
         </table>
       </div>
+
+      <PaginationControls
+        page={currentPage}
+        totalPages={totalPages}
+        totalItems={filteredRsvps.length}
+        onPageChange={setPage}
+      />
     </section>
   );
 }

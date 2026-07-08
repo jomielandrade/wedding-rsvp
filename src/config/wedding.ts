@@ -196,13 +196,13 @@ export const weddingConfig: WeddingConfig = {
       id: "plus-one",
       question: "Can I bring a plus one?",
       answer:
-        "We kindly request that only guests named on the invitation attend. If your invitation includes a plus one, it will be indicated on your personal invite link.",
+        "To keep the ceremony intimate, only our parents and godparents are required to attend the civil rites. If your invitation includes a plus one, it will be shown on your personal invite link.",
     },
     {
       id: "arrival-time",
       question: "What time should I arrive?",
       answer:
-        "Please arrive 15–30 minutes before the ceremony begins at 10:00 AM. This allows time for seating and ensures we can start on schedule.",
+        "Please follow your invitation schedule at 10:00 AM. The 9:00 AM timeslot is for another couple, so for our wedding, kindly arrive around 9:45 AM.",
     },
     {
       id: "parking",
@@ -220,7 +220,7 @@ export const weddingConfig: WeddingConfig = {
       id: "rsvp-deadline",
       question: "When should I RSVP?",
       answer:
-        "Please RSVP by June 15, 2026 so we can finalize our preparations. You may update your response anytime before the deadline.",
+        "Please RSVP by July 12, 2026 so we can finalize our preparations. If you can attend or not, please inform us directly as well.",
     },
   ],
   giftRegistry: {

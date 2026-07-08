@@ -98,6 +98,8 @@ export interface GuestRecord {
   slug: string;
   full_name: string;
   max_guests: number;
+  status_override: AttendanceStatus | null;
+  status_override_at: string | null;
   first_opened_at: string | null;
   last_opened_at: string | null;
   open_count: number;

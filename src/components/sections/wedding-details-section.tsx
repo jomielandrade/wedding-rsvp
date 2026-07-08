@@ -54,12 +54,9 @@ export function WeddingDetailsSection() {
       <SectionHeader title="Wedding Details" subtitle="The Celebration" />
 
       <FadeUp delay={0.05}>
-        <div className="glass-card mx-auto mb-12 flex max-w-3xl items-start gap-4 px-6 py-5 md:items-center">
-          <Clock
-            className="mt-0.5 h-5 w-5 shrink-0 text-primary md:mt-0"
-            aria-hidden="true"
-          />
-          <p className="text-sm leading-relaxed text-text/75 md:text-center">
+        <div className="mx-auto mb-12 flex max-w-2xl items-start justify-center gap-3 px-2 py-1">
+        
+          <p className="text-center text-sm leading-relaxed text-text/75">
             <span className="font-medium text-text">Kindly arrive 15–30 minutes early</span>{" "}
             so we can begin on time. We can&apos;t wait to celebrate with you on{" "}
             {weddingDateDisplay}.
