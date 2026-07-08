@@ -6,10 +6,7 @@ import { VenueCard } from "@/components/features/wedding-details/venue-card";
 import { VenueMap } from "@/components/features/wedding-details/venue-map";
 import { SectionHeader } from "@/components/layout/section-header";
 import { SECTION_IDS } from "@/lib/constants";
-import {
-  buildCeremonyEvent,
-  buildReceptionEvent,
-} from "@/utils/calendar";
+import { buildCeremonyEvent, buildReceptionEvent } from "@/utils/calendar";
 
 export function WeddingDetailsSection() {
   const {
@@ -55,9 +52,10 @@ export function WeddingDetailsSection() {
 
       <FadeUp delay={0.05}>
         <div className="mx-auto mb-12 flex max-w-2xl items-start justify-center gap-3 px-2 py-1">
-        
           <p className="text-center text-sm leading-relaxed text-text/75">
-            <span className="font-medium text-text">Kindly arrive 15–30 minutes early</span>{" "}
+            <span className="font-medium text-text">
+              Kindly arrive 15–30 minutes early
+            </span>{" "}
             so we can begin on time. We can&apos;t wait to celebrate with you on{" "}
             {weddingDateDisplay}.
           </p>
