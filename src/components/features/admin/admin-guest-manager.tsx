@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Check, Copy, Eye, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 import type { AdminGuestRow } from "@/types/admin";
 import { AdminGuestFormDialog } from "@/components/features/admin/admin-guest-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,62 @@ interface AdminGuestManagerProps {
   guests: AdminGuestRow[];
 }
 
+const PAGE_SIZE = 10;
+
 const statusStyles = {
   pending: "bg-amber-50 text-amber-700",
   attending: "bg-emerald-50 text-emerald-700",
   declining: "bg-rose-50 text-rose-700",
 } as const;
+
+function formatRelativeTime(value: string) {
+  const parsed = new Date(value);
+  const diffMs = Date.now() - parsed.getTime();
+  const diffSeconds = Math.max(1, Math.floor(diffMs / 1000));
+
+  if (diffSeconds < 60) return "just now";
+  if (diffSeconds < 3600) {
+    const minutes = Math.floor(diffSeconds / 60);
+    return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  }
+  if (diffSeconds < 86400) {
+    const hours = Math.floor(diffSeconds / 3600);
+    return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  }
+  if (diffSeconds < 604800) {
+    const days = Math.floor(diffSeconds / 86400);
+    return `${days} day${days === 1 ? "" : "s"} ago`;
+  }
+  const weeks = Math.floor(diffSeconds / 604800);
+  if (weeks < 5) {
+    return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  }
+  const months = Math.floor(diffSeconds / 2629800);
+  if (months < 12) {
+    return `${months} month${months === 1 ? "" : "s"} ago`;
+  }
+  const years = Math.floor(diffSeconds / 31557600);
+  return `${years} year${years === 1 ? "" : "s"} ago`;
+}
+
+function getOpenCountTone(openCount: number) {
+  if (openCount >= 10) {
+    return {
+      badge: "border-violet-200 bg-violet-50 text-violet-700",
+      countPill: "bg-violet-100 text-violet-800",
+    };
+  }
+  if (openCount >= 5) {
+    return {
+      badge: "border-indigo-200 bg-indigo-50 text-indigo-700",
+      countPill: "bg-indigo-100 text-indigo-800",
+    };
+  }
+  return {
+    badge: "border-sky-100 bg-sky-50 text-sky-700",
+    countPill: "bg-white/80 text-sky-800",
+  };
+}
 
 function CopyLinkButton({
   url,
@@ -51,22 +102,6 @@ function CopyLinkButton({
       {copied ? <Check className="text-emerald-600" /> : <Copy />}
       {copied ? "Copied" : "Copy invite link"}
     </Button>
-  );
-}
-
-function GuestOpenedBadge({ guest }: { guest: AdminGuestRow }) {
-  if (!guest.inviteOpened) {
-    return (
-      <span className="inline-flex rounded-full bg-black/[0.04] px-2.5 py-1 text-xs font-medium text-text/50">
-        Not opened
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700">
-      Opened
-    </span>
   );
 }
 
@@ -144,6 +179,8 @@ function AdminGuestCard({
   resettingId: string | null;
   deletingId: string | null;
 }) {
+  const openTone = getOpenCountTone(guest.openCount);
+
   return (
     <article className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
@@ -165,16 +202,36 @@ function AdminGuestCard({
         >
           {guest.status}
         </span>
-        <GuestOpenedBadge guest={guest} />
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
+            guest.inviteOpened
+              ? `border ${openTone.badge}`
+              : "bg-black/[0.04] text-text/50",
+          )}
+        >
+          {guest.inviteOpened ? <Eye className="h-3.5 w-3.5" /> : null}
+          {guest.inviteOpened
+            ? `Opened (${guest.openCount}x)`
+            : "Not opened"}
+        </span>
       </div>
 
       {guest.firstOpenedAt && (
         <p className="mt-2 text-xs text-text/50">
-          First opened{" "}
-          {new Date(guest.firstOpenedAt).toLocaleString("en-PH", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}
+          Last opened{" "}
+          <span
+            className="font-medium text-text/65"
+            title={new Date(guest.lastOpenedAt ?? guest.firstOpenedAt).toLocaleString(
+              "en-PH",
+              {
+                dateStyle: "full",
+                timeStyle: "long",
+              },
+            )}
+          >
+            {formatRelativeTime(guest.lastOpenedAt ?? guest.firstOpenedAt)}
+          </span>
         </p>
       )}
 
@@ -202,6 +259,56 @@ function AdminGuestCard({
   );
 }
 
+function PaginationControls({
+  page,
+  totalPages,
+  totalItems,
+  itemLabel,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  itemLabel: string;
+  onPageChange: (nextPage: number) => void;
+}) {
+  if (totalItems === 0) return null;
+
+  const from = (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, totalItems);
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-black/5 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p className="text-xs text-text/55 sm:text-sm">
+        Showing {from}-{to} of {totalItems} {itemLabel}
+      </p>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+        >
+          Previous
+        </Button>
+        <span className="text-xs text-text/60 sm:text-sm">
+          Page {page} / {totalPages}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -216,6 +323,7 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [resettingId, setResettingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const filteredGuests = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -233,6 +341,17 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
       return matchesQuery && matchesStatus && matchesOpened;
     });
   }, [guests, query, statusFilter, openedFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, statusFilter, openedFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredGuests.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedGuests = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredGuests.slice(start, start + PAGE_SIZE);
+  }, [filteredGuests, currentPage]);
 
   const openCreateDialog = () => {
     setEditingGuest(null);
@@ -375,10 +494,10 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
         </div>
 
         <div className="space-y-3 p-4 lg:hidden">
-          {filteredGuests.length === 0 ? (
+          {paginatedGuests.length === 0 ? (
             <p className="py-10 text-center text-sm text-text/50">{emptyMessage}</p>
           ) : (
-            filteredGuests.map((guest) => (
+            paginatedGuests.map((guest) => (
               <AdminGuestCard
                 key={guest.id}
                 guest={guest}
@@ -405,14 +524,16 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
               </tr>
             </thead>
             <tbody>
-              {filteredGuests.length === 0 ? (
+              {paginatedGuests.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-text/50">
                     {emptyMessage}
                   </td>
                 </tr>
               ) : (
-                filteredGuests.map((guest) => (
+                paginatedGuests.map((guest) => {
+                  const openTone = getOpenCountTone(guest.openCount);
+                  return (
                   <tr
                     key={guest.id}
                     className="border-b border-black/5 last:border-0"
@@ -434,18 +555,38 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                     <td className="px-6 py-4">
                       {guest.inviteOpened ? (
                         <div>
-                          <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700">
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
+                              openTone.badge,
+                            )}
+                          >
+                            <Eye className="mr-1 h-3.5 w-3.5" />
                             Opened
+                            <span
+                              className={cn(
+                                "ml-1 rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
+                                openTone.countPill,
+                              )}
+                            >
+                              {guest.openCount}x
+                            </span>
                           </span>
                           {guest.firstOpenedAt && (
                             <p className="mt-1 text-xs text-text/50">
-                              {new Date(guest.firstOpenedAt).toLocaleString(
-                                "en-PH",
-                                {
-                                  dateStyle: "medium",
-                                  timeStyle: "short",
-                                },
-                              )}
+                              <span
+                                className="cursor-help border-b border-dotted border-text/30"
+                                title={new Date(
+                                  guest.lastOpenedAt ?? guest.firstOpenedAt,
+                                ).toLocaleString("en-PH", {
+                                  dateStyle: "full",
+                                  timeStyle: "long",
+                                })}
+                              >
+                                {formatRelativeTime(
+                                  guest.lastOpenedAt ?? guest.firstOpenedAt,
+                                )}
+                              </span>
                             </p>
                           )}
                         </div>
@@ -473,11 +614,20 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                       />
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
+
+        <PaginationControls
+          page={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredGuests.length}
+          itemLabel="guests"
+          onPageChange={setPage}
+        />
       </section>
 
       <AdminGuestFormDialog
