@@ -2,10 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Eye, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Eye,
+  Pencil,
+  Plus,
+  RotateCcw,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
+} from "lucide-react";
 import type { AdminGuestRow } from "@/types/admin";
 import { AdminGuestFormDialog } from "@/components/features/admin/admin-guest-form-dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -107,17 +118,24 @@ function CopyLinkButton({
 
 function GuestActionButtons({
   guest,
+  onMarkStatus,
   onEdit,
   onResetRsvp,
   onDelete,
+  markingId,
   resettingId,
   deletingId,
   compact = false,
 }: {
   guest: AdminGuestRow;
+  onMarkStatus: (
+    guest: AdminGuestRow,
+    status: "attending" | "declining",
+  ) => void;
   onEdit: (guest: AdminGuestRow) => void;
   onResetRsvp: (guest: AdminGuestRow) => void;
   onDelete: (guest: AdminGuestRow) => void;
+  markingId: string | null;
   resettingId: string | null;
   deletingId: string | null;
   compact?: boolean;
@@ -129,6 +147,30 @@ function GuestActionButtons({
         compact && "gap-2 [&_button]:flex-1 [&_button]:justify-center",
       )}
     >
+      {guest.status === "pending" && (
+        <>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onMarkStatus(guest, "attending")}
+            disabled={markingId === guest.id}
+          >
+            <ThumbsUp />
+            Attending
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onMarkStatus(guest, "declining")}
+            disabled={markingId === guest.id}
+          >
+            <ThumbsDown />
+            Declining
+          </Button>
+        </>
+      )}
       <Button
         type="button"
         variant="ghost"
@@ -166,16 +208,23 @@ function GuestActionButtons({
 
 function AdminGuestCard({
   guest,
+  onMarkStatus,
   onEdit,
   onResetRsvp,
   onDelete,
+  markingId,
   resettingId,
   deletingId,
 }: {
   guest: AdminGuestRow;
+  onMarkStatus: (
+    guest: AdminGuestRow,
+    status: "attending" | "declining",
+  ) => void;
   onEdit: (guest: AdminGuestRow) => void;
   onResetRsvp: (guest: AdminGuestRow) => void;
   onDelete: (guest: AdminGuestRow) => void;
+  markingId: string | null;
   resettingId: string | null;
   deletingId: string | null;
 }) {
@@ -217,6 +266,12 @@ function AdminGuestCard({
         </span>
       </div>
 
+      {guest.statusSource === "override" && (
+        <p className="mt-2 text-xs font-medium text-violet-700">
+          Overridden manually in admin. Use Reset to clear override.
+        </p>
+      )}
+
       {guest.firstOpenedAt && (
         <p className="mt-2 text-xs text-text/50">
           Last opened{" "}
@@ -247,9 +302,11 @@ function AdminGuestCard({
       <div className="mt-4 border-t border-black/5 pt-3">
         <GuestActionButtons
           guest={guest}
+          onMarkStatus={onMarkStatus}
           onEdit={onEdit}
           onResetRsvp={onResetRsvp}
           onDelete={onDelete}
+          markingId={markingId}
           resettingId={resettingId}
           deletingId={deletingId}
           compact
@@ -321,8 +378,13 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingGuest, setEditingGuest] = useState<AdminGuestRow | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [markingId, setMarkingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [resettingId, setResettingId] = useState<string | null>(null);
+  const [overrideConfirm, setOverrideConfirm] = useState<{
+    guest: AdminGuestRow;
+    status: "attending" | "declining";
+  } | null>(null);
   const [page, setPage] = useState(1);
 
   const filteredGuests = useMemo(() => {
@@ -364,9 +426,11 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
   };
 
   const onResetRsvp = async (guest: AdminGuestRow) => {
-    const confirmed = window.confirm(
-      `Reset RSVP for ${guest.fullName}? They will be able to submit again.`,
-    );
+    const resetScope =
+      guest.statusSource === "override"
+        ? "This will clear the manual override and any RSVP response."
+        : "They will be able to submit again.";
+    const confirmed = window.confirm(`Reset RSVP for ${guest.fullName}? ${resetScope}`);
     if (!confirmed) return;
 
     setActionError(null);
@@ -393,6 +457,49 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
       setActionError("Unable to reset RSVP. Please check your connection.");
     } finally {
       setResettingId(null);
+    }
+  };
+
+  const onMarkStatus = async (
+    guest: AdminGuestRow,
+    status: "attending" | "declining",
+  ) => {
+    setOverrideConfirm({ guest, status });
+  };
+
+  const confirmOverride = async () => {
+    if (!overrideConfirm) return;
+
+    const { guest, status } = overrideConfirm;
+    setActionError(null);
+    setMarkingId(guest.id);
+    setOverrideConfirm(null);
+
+    try {
+      const response = await fetch(
+        `/api/admin/guests/${guest.id}/override-status`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        },
+      );
+      const result = await response.json();
+
+      if (!response.ok) {
+        setActionError(
+          typeof result.error === "string"
+            ? result.error
+            : "Unable to update guest status.",
+        );
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      setActionError("Unable to update guest status. Please check your connection.");
+    } finally {
+      setMarkingId(null);
     }
   };
 
@@ -501,9 +608,11 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
               <AdminGuestCard
                 key={guest.id}
                 guest={guest}
+                onMarkStatus={onMarkStatus}
                 onEdit={openEditDialog}
                 onResetRsvp={onResetRsvp}
                 onDelete={onDelete}
+                markingId={markingId}
                 resettingId={resettingId}
                 deletingId={deletingId}
               />
@@ -551,6 +660,11 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                       >
                         {guest.status}
                       </span>
+                      {guest.statusSource === "override" && (
+                        <p className="mt-1 text-[11px] font-medium text-violet-700">
+                          Overridden
+                        </p>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {guest.inviteOpened ? (
@@ -606,9 +720,11 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
                     <td className="px-6 py-4">
                       <GuestActionButtons
                         guest={guest}
+                        onMarkStatus={onMarkStatus}
                         onEdit={openEditDialog}
                         onResetRsvp={onResetRsvp}
                         onDelete={onDelete}
+                        markingId={markingId}
                         resettingId={resettingId}
                         deletingId={deletingId}
                       />
@@ -636,6 +752,38 @@ export function AdminGuestManager({ guests }: AdminGuestManagerProps) {
         guest={editingGuest}
         onSuccess={() => router.refresh()}
       />
+
+      <Dialog
+        open={Boolean(overrideConfirm)}
+        onOpenChange={(open) => !open && setOverrideConfirm(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogTitle>Confirm status override</DialogTitle>
+          {overrideConfirm && (
+            <p className="text-sm leading-relaxed text-text/70">
+              Set <span className="font-medium text-text">{overrideConfirm.guest.fullName}</span>{" "}
+              to{" "}
+              <span className="font-medium capitalize text-text">
+                {overrideConfirm.status}
+              </span>
+              ? This applies a manual override. You can clear it anytime using{" "}
+              <span className="font-medium text-text">Reset</span>.
+            </p>
+          )}
+          <div className="mt-2 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOverrideConfirm(null)}
+            >
+              Cancel
+            </Button>
+            <Button type="button" onClick={() => void confirmOverride()}>
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

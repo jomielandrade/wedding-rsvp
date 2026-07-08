@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/admin";
-import { getGuestById } from "@/services/guest.service";
+import { getGuestById, setGuestStatusOverride } from "@/services/guest.service";
 import {
   deleteRsvpByInviteSlug,
   findRsvpByInviteSlug,
@@ -40,21 +40,33 @@ export async function POST(_request: Request, { params }: RouteParams) {
     );
   }
 
-  if (!rsvp) {
-    return NextResponse.json(
-      { error: "This guest has not submitted an RSVP." },
-      { status: 400 },
-    );
+  const hasOverride = Boolean(guest.status_override);
+
+  if (!rsvp && !hasOverride) {
+    return NextResponse.json({ error: "No RSVP or override to reset." }, { status: 400 });
   }
 
-  const { error: deleteError } = await deleteRsvpByInviteSlug(guest.slug);
-  if (deleteError) {
-    console.error("Delete RSVP error:", deleteError);
-    return NextResponse.json(
-      { error: "Unable to reset RSVP." },
-      { status: 500 },
-    );
+  if (rsvp) {
+    const { error: deleteError } = await deleteRsvpByInviteSlug(guest.slug);
+    if (deleteError) {
+      console.error("Delete RSVP error:", deleteError);
+      return NextResponse.json(
+        { error: "Unable to reset RSVP." },
+        { status: 500 },
+      );
+    }
   }
 
-  return NextResponse.json({ success: true });
+  if (hasOverride) {
+    const { error: overrideError } = await setGuestStatusOverride(id, null);
+    if (overrideError) {
+      console.error("Clear override error:", overrideError);
+      return NextResponse.json(
+        { error: "Unable to clear status override." },
+        { status: 500 },
+      );
+    }
+  }
+
+  return NextResponse.json({ success: true, clearedOverride: hasOverride });
 }

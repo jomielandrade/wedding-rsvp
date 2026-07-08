@@ -12,17 +12,31 @@ export function buildRsvpStats(
   guests: GuestRecord[],
   rsvps: RsvpRecord[],
 ): RsvpStats {
+  const rsvpBySlug = new Map(rsvps.map((rsvp) => [rsvp.invite_slug, rsvp]));
   const totalInvited = guests.length;
   const invitedHeadcount = guests.reduce(
     (sum, guest) => sum + guest.max_guests,
     0,
   );
-  const attending = rsvps.filter((r) => r.attendance === "attending").length;
-  const declining = rsvps.filter((r) => r.attendance === "declining").length;
+
+  let attending = 0;
+  let declining = 0;
+  let confirmedHeadcount = 0;
+
+  for (const guest of guests) {
+    const status = guest.status_override ?? rsvpBySlug.get(guest.slug)?.attendance;
+    if (status === "attending") {
+      attending += 1;
+      confirmedHeadcount +=
+        guest.status_override === "attending"
+          ? guest.max_guests
+          : (rsvpBySlug.get(guest.slug)?.guest_count ?? guest.max_guests);
+    } else if (status === "declining") {
+      declining += 1;
+    }
+  }
+
   const totalResponded = attending + declining;
-  const confirmedHeadcount = rsvps
-    .filter((r) => r.attendance === "attending")
-    .reduce((sum, r) => sum + r.guest_count, 0);
 
   return {
     totalInvited,
@@ -48,13 +62,21 @@ export function buildGuestRows(
 
   return guests.map((guest) => {
     const rsvp = rsvpBySlug.get(guest.slug) ?? null;
+    const status = guest.status_override ?? rsvp?.attendance ?? "pending";
+    const statusSource = guest.status_override
+      ? "override"
+      : rsvp
+        ? "rsvp"
+        : "pending";
     return {
       id: guest.id,
       slug: guest.slug,
       fullName: guest.full_name,
       maxGuests: guest.max_guests,
       inviteUrl: getInviteUrl(guest.slug, siteUrl),
-      status: rsvp?.attendance ?? "pending",
+      status,
+      statusSource,
+      overrideAt: guest.status_override_at,
       inviteOpened: Boolean(guest.first_opened_at),
       firstOpenedAt: guest.first_opened_at,
       lastOpenedAt: guest.last_opened_at,
@@ -97,6 +119,12 @@ export function toExportRows(guests: AdminGuestRow[]) {
         : guest.status === "attending"
           ? "Attending"
           : "Declining",
+    "Status Source":
+      guest.statusSource === "override"
+        ? "Manual override"
+        : guest.statusSource === "rsvp"
+          ? "RSVP"
+          : "Pending",
     "Invite URL": guest.inviteUrl,
     "Invite Opened": guest.inviteOpened ? "Yes" : "No",
     "First Opened": guest.firstOpenedAt
