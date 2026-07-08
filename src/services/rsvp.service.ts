@@ -10,7 +10,6 @@ export interface RsvpInsertPayload {
   attendance: RsvpFormValues["attendance"];
   guest_count: number;
   companion_names: string[];
-  song_request: string | null;
   message: string | null;
 }
 
@@ -32,7 +31,6 @@ export function toRsvpInsertPayload(
             .map((name) => name.trim())
             .filter(Boolean)
         : [],
-    song_request: null,
     message: data.message?.trim() || null,
   };
 }

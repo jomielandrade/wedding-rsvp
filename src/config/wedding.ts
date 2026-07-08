@@ -15,7 +15,7 @@ export const weddingConfig: WeddingConfig = {
   ceremony: {
     name: "Pateros Municipal Hall",
     address: "Pateros, Metro Manila, Philippines",
-    time: "9:00 AM",
+    time: "10:00 AM",
     mapsUrl: "https://maps.app.goo.gl/sFGE4xbiGvXrCdk96",
   },
   reception: {
@@ -202,7 +202,7 @@ export const weddingConfig: WeddingConfig = {
       id: "arrival-time",
       question: "What time should I arrive?",
       answer:
-        "Please arrive 15–30 minutes before the ceremony begins at 9:00 AM. This allows time for seating and ensures we can start on schedule.",
+        "Please arrive 15–30 minutes before the ceremony begins at 10:00 AM. This allows time for seating and ensures we can start on schedule.",
     },
     {
       id: "parking",

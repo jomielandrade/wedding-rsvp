@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getGuestBySlug } from "@/lib/guests";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { rsvpSchema } from "@/lib/validations/rsvp";
 import {
   createRsvp,
@@ -17,9 +17,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rateLimit = checkRateLimit(ip);
+  const ip = getClientIp(request);
+  const rateLimit = checkRateLimit(`rsvp:${ip}`);
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
@@ -94,6 +93,15 @@ export async function POST(request: Request) {
   const { data, error } = await createRsvp(payload);
 
   if (error) {
+    // Unique-violation on invite_slug: a concurrent request won the race after
+    // our pre-check. Surface the same friendly 409 as the pre-check path.
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { error: "You have already submitted an RSVP for this invitation." },
+        { status: 409 },
+      );
+    }
+
     console.error("RSVP insert error:", error);
     return NextResponse.json(
       { error: "Unable to save your RSVP. Please try again." },
