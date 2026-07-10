@@ -251,7 +251,7 @@ export const weddingConfig: WeddingConfig = {
   },
   socialLinks: [],
   rsvp: {
-    deadline: "2026-06-15",
+    deadline: "2026-07-12",
     emailConfirmation: false,
   },
 };
